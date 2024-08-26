@@ -37,7 +37,9 @@ def Z_score(samples):
     medias = muestras.mean(axis=0)
     desv_est = muestras.std(axis=0)
 
-    muestras_estandarizadas = (muestras-medias/desv_est)
+    desv_est[desv_est == 0] = 1
+
+    muestras_estandarizadas = (muestras-medias) / desv_est
 
     return muestras_estandarizadas.tolist()
 
@@ -77,6 +79,10 @@ if __name__ == "__main__":
     params = (0,0,0)
 
     linear_regression(params,caracteristicas_casa,precio,5000,learning_rate)
+
+    import matplotlib.pyplot as plt
+    plt.plot(errores)
+    plt.show()
 
 
 
