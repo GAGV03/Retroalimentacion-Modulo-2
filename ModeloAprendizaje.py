@@ -86,10 +86,10 @@ if __name__ == "__main__":
     params = [0, 0, 0]
 
     # Conjunto de características de los estudiantes (Puntaje de examen, Promedio acumulado)
-    datos_estudiantes = [[85, 9.5], [95, 8.7], [55, 6.2], [90, 9.8], [70, 7.9], [60, 3.5], [40, 6.0], [85, 7.4], [92, 8.6], [88, 8.5]]
+    datos_estudiantes = [[85, 9.5], [95, 8.7], [55, 6.2], [90, 9.8], [70, 7.9], [60, 3.5], [40, 6.0], [85, 7.4], [92, 8.6], [88, 8.5], [20,2.5], [30,4.0], [10,3.0]]
     
     # Este es el estado de su admisión. (0 - No admitido / 1 - Admitido)
-    admision = [1, 1, 0, 1, 0, 0, 0, 1, 1, 1]
+    admision = [1, 1, 0, 1, 0, 0, 0, 1, 1, 1,0,0,0]
     
     learning_rate = 0.01
 
