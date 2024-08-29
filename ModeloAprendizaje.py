@@ -101,9 +101,10 @@ if __name__ == "__main__":
     plt.ylabel('Error Medio (Entropía Cruzada)')
     plt.show()
 
-    nuevo_estudiante = [20, 3.5]
-    nuevo_estudiante_normalizado = Normalizacion_nuevos_datos(nuevo_estudiante, min_vals, range_vals)
-    nuevo_estudiante_normalizado = [1] + nuevo_estudiante_normalizado.tolist()  
-    probabilidad = hipotesis(params_finales, nuevo_estudiante_normalizado)
-    print("La probabilidad predicha de que el nuevo estudiante sea admitido es: " + str(probabilidad))
+    nuevos_estudiantes = [[20, 3.5],[100,10],[95,8.5],[50,6.5],[70,7.0],[80,8.0],[10,10]]
+    for estudiante in nuevos_estudiantes:
+        nuevo_estudiante_normalizado = Normalizacion_nuevos_datos(estudiante, min_vals, range_vals)
+        nuevo_estudiante_normalizado = [1] + nuevo_estudiante_normalizado.tolist()  
+        probabilidad = hipotesis(params_finales, nuevo_estudiante_normalizado)
+        print("La probabilidad predicha de que el nuevo estudiante sea admitido es: " + str(probabilidad))
 
