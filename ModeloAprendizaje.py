@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 errores = []
 
@@ -8,9 +9,7 @@ def sigmoide(z):
 
 # Hipótesis de regresión logística
 def hipotesis(params, samples):
-    valor_acumulado = 0
-    for i in range(len(params)):
-        valor_acumulado += params[i] * samples[i]
+    valor_acumulado = np.dot(params, samples)
     return sigmoide(valor_acumulado)
 
 # Función de costo: Entropía cruzada
@@ -18,74 +17,83 @@ def cross_entropy_loss(params, samples, valor_y):
     sum_error = 0
     for i in range(len(samples)):
         h = hipotesis(params, samples[i])
+        h = np.clip(h, 1e-10, 1 - 1e-10) # Manejo de log(0) para evitar errores
         error = -valor_y[i] * np.log(h) - (1 - valor_y[i]) * np.log(1 - h)
         sum_error += error
     error_medio = sum_error / len(samples)
     print("Error medio (entropía cruzada): " + str(error_medio))
     errores.append(error_medio)
+    return error_medio
 
-# Descenso de gradiente para la regresión logística
 def GradientDescent(params, samples, learn_rate, valor_y):
-    avance = list(params)
-    for j in range(len(params)):
+    params = np.array(params)
+    num_samples = len(samples)
+    num_caracteristicas = len(params)
+    params_nuevos = np.zeros(num_caracteristicas)
+    
+    for j in range(num_caracteristicas):
         sum_error = 0
-        for i in range(len(samples)):
+        for i in range(num_samples):
             error = hipotesis(params, samples[i]) - valor_y[i]
             sum_error += error * samples[i][j]
-        avance[j] = params[j] - learn_rate * (1 / len(samples)) * sum_error
-    return avance
+        params_nuevos[j] = (1 / num_samples) * sum_error
+    
+    return params - learn_rate * params_nuevos
 
 # Normalización de los datos
 def Normalizacion(samples):
     samples = np.array(samples, dtype=float)
     min_vals = np.min(samples, axis=0)
     max_vals = np.max(samples, axis=0)
-    range_vals = max_vals - min_vals
+    diferencia = max_vals - min_vals
 
-    range_vals = np.clip(range_vals, a_min=1e-8, a_max=None)
+    diferencia = np.clip(diferencia, a_min=1e-8, a_max=None) #Evita la división entre 0
 
-    normalized_samples = (samples - min_vals) / range_vals
+    normalized_samples = (samples - min_vals) / diferencia
 
-    return normalized_samples.tolist()
+    return normalized_samples.tolist(), min_vals, diferencia
+
+def Normalizacion_nuevos_datos(nuevos_datos, min_vals, range_vals):
+    nuevos_datos_norm = (np.array(nuevos_datos) - min_vals) / range_vals
+    return nuevos_datos_norm
 
 # Regresión logística
-def logistic_regression(params, samples, valor_y, num_epochs, learning_rate):
+def logistic_regression(params, samples, valor_y, learning_rate):
+    samples, min_vals, range_vals = Normalizacion(samples)
+    
     for i in range(len(samples)):
-        if isinstance(samples[i], list):
-            samples[i] = [1] + samples[i]
-        else:
-            samples[i] = [1, samples[i]]
-
-    print("Antes de normalizar: " + str(samples))
-    samples = Normalizacion(samples)
-    print("Despues de normalizar: " + str(samples))
+        samples[i] = [1] + samples[i]
 
     epochs = 0
     while True:
-        oldparams = list(params)
+        oldparams = np.array(params)
         print(f"Epoch #: {epochs}")
         print("Parametros actuales: " + str(params))
         params = GradientDescent(params, samples, learning_rate, valor_y)
-        cross_entropy_loss(params, samples, valor_y)
+        error = cross_entropy_loss(params, samples, valor_y)
         print(params)
         epochs += 1
-        if oldparams == params or epochs == num_epochs:
+        # Verifica si los parámetros han cambiado suficientemente
+        if np.allclose(oldparams, params, atol=1e-6) or error < 0.01:
             print("ENTRENAMIENTO FINALIZADO")
-            print("Muestras: " + str(samples))
-            print("Parametros finales: " + str(params))
             break
-    return params
+    print("Muestras: " + str(samples))
+    print("Parametros finales: " + str(params))
+    return params, min_vals, range_vals
 
 if __name__ == "__main__":
-    # Conjunto de características de una casa (Superficie en metros cuadrados, número de recámaras)
-    caracteristicas_casa = [[1400, 3], [2400, 7], [1800, 4], [1900, 5], [1300, 2], [1100, 2]]
-    precio = [1, 1, 0, 1, 0, 0]  # Precio transformado en 1 o 0 (binario)
-    learning_rate = 0.001
-
-    # Coeficiente para las características de la casa y el término independiente
+    # Coeficiente para las características del estudiante y el término independiente
     params = [0, 0, 0]
 
-    params_finales = logistic_regression(params, caracteristicas_casa, precio, 5000, learning_rate)
+    # Conjunto de características de los estudiantes (Puntaje de examen, Promedio acumulado)
+    datos_estudiantes = [[85, 9.5], [95, 8.7], [55, 6.2], [90, 9.8], [70, 7.9], [60, 3.5], [40, 6.0], [85, 7.4], [92, 8.6], [88, 8.5]]
+    
+    # Este es el estado de su admisión. (0 - No admitido / 1 - Admitido)
+    admision = [1, 1, 0, 1, 0, 0, 0, 1, 1, 1]
+    
+    learning_rate = 0.01
+
+    params_finales, min_vals, range_vals = logistic_regression(params, datos_estudiantes, admision, learning_rate)
 
     import matplotlib.pyplot as plt
     plt.plot(errores)
@@ -93,12 +101,9 @@ if __name__ == "__main__":
     plt.ylabel('Error Medio (Entropía Cruzada)')
     plt.show()
 
-    nueva_casa = [1, 1500, 3]
-    nueva_casa_normalizada = Normalizacion(nueva_casa)
-    probabilidad = hipotesis(params_finales, nueva_casa_normalizada)
-    print("La probabilidad predicha de que la nueva casa pertenezca a la clase 1 es: " + str(probabilidad))
-
-
-
-
+    nuevo_estudiante = [20, 3.5]
+    nuevo_estudiante_normalizado = Normalizacion_nuevos_datos(nuevo_estudiante, min_vals, range_vals)
+    nuevo_estudiante_normalizado = [1] + nuevo_estudiante_normalizado.tolist()  
+    probabilidad = hipotesis(params_finales, nuevo_estudiante_normalizado)
+    print("La probabilidad predicha de que el nuevo estudiante sea admitido es: " + str(probabilidad))
 
