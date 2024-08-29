@@ -3,11 +3,11 @@ import math
 
 errores = []
 
-# Función sigmoide
+# Función sigmoide (Activación)
 def sigmoide(z):
     return 1 / (1 + np.exp(-z))
 
-# Hipótesis de regresión logística
+# Hipótesis de regresión logística (Aplicando Sigmoide)
 def hipotesis(params, samples):
     valor_acumulado = np.dot(params, samples)
     return sigmoide(valor_acumulado)
@@ -89,7 +89,7 @@ if __name__ == "__main__":
     datos_estudiantes = [[85, 9.5], [95, 8.7], [55, 6.2], [90, 9.8], [70, 7.9], [60, 3.5], [40, 6.0], [85, 7.4], [92, 8.6], [88, 8.5], [20,2.5], [30,4.0], [10,3.0]]
     
     # Este es el estado de su admisión. (0 - No admitido / 1 - Admitido)
-    admision = [1, 1, 0, 1, 0, 0, 0, 1, 1, 1,0,0,0]
+    admision = [1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0]
     
     learning_rate = 0.01
 
