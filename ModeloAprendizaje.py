@@ -77,10 +77,9 @@ def logistic_regression(params, samples, valor_y, learning_rate):
         epochs += 1
         # Verifica si los parámetros han cambiado suficientemente
         if np.allclose(oldparams, params, atol=1e-6) or error < 0.01:
+            print("*************************************")
             print("ENTRENAMIENTO FINALIZADO")
             break
-    #print("Muestras: " + str(samples))
-    #print("Parametros finales: " + str(params))
     return params, min_vals, range_vals
 
 if __name__ == "__main__":
@@ -106,50 +105,81 @@ if __name__ == "__main__":
     plt.ylabel('Error Medio (Entropía Cruzada)')
     plt.show()
 
-    #Aqui va la validacao TOCA HACER ESTA MIERDA :(
-
+    #Aqui se entra a la etapa de validación
     print("*************************************")
     print("VALIDACIONES DEL MODELO")
     print("*************************************")
 
+    # Inicializar contadores
+    TP = 0
+    TN = 0
+    FP = 0
+    FN = 0
+
     validation_data = pd.read_csv('validation.csv')
     datos_validation = validation_data[['PuntajeExamen','PromedioAcumulado']].values
     resultados_validation = validation_data[['Admision']].values
+    contador = 1
 
     for estudiante,resultado in zip (datos_validation,resultados_validation):
         estudiante_validation_normalizado = Normalizacion_nuevos_datos(estudiante,min_vals,range_vals)
         estudiante_validation_normalizado = [1] + estudiante_validation_normalizado.tolist()
         probabilidad_validation = hipotesis(params_finales,estudiante_validation_normalizado)
         if probabilidad_validation < 0.5:
-            print(probabilidad_validation)
             resultado_validation = 0
             if resultado_validation == resultado:
-                print("La predicción fue correcta")
+                print(f"{contador}) La predicción fue correcta")
             else:
-                print("La predicción no fue correcta")
+                print(f"{contador})La predicción no fue correcta")
         else:
-            print(probabilidad_validation)
             resultado_validation = 1
             if resultado_validation == resultado:
-                print("La predicción fue correcta")
+                print(f"{contador})La predicción fue correcta")
             else:
-                print("La predicción no fue correcta")
-        
+                print(f"{contador})La predicción no fue correcta")
+        contador += 1
 
-    # print("*************************************")
-    # print("PREDICCIONES PARA EL SET DE TESTING")
-    # print("*************************************")
+        if resultado_validation == 1 and resultado == 1:
+            TP += 1
+        elif resultado_validation == 0 and resultado == 0:
+            TN += 1
+        elif resultado_validation == 1 and resultado == 0:
+            FP += 1
+        elif resultado_validation == 0 and resultado == 1:
+            FN += 1
+        
+    # Calcular las métricas 
+    precision = TP / (TP + FP) if (TP + FP) > 0 else 0
+    recall = TP / (TP + FN) if (TP + FN) > 0 else 0
+    f1_score = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
+
+    # Matriz de confusión
+    matriz_confusion = [[TN, FP], [FN, TP]]
+
+    # Mostrar resultados
+    print("*************************************")
+    print("MÉTRICAS DE VALORACIÓN DEL MODELO")
+    print("*************************************")
+    print(f"Matriz de Confusión: {matriz_confusion}")
+    print(f"Precisión: {precision}")
+    print(f"Recall: {recall}")
+    print(f"F1 Score: {f1_score}")
+
+    #Aqui se entra a la etapa de testing
+    print("*************************************")
+    print("PREDICCIONES PARA EL SET DE TESTING")
+    print("*************************************")
     
-    # contador = 1
-    # testing_data = pd.read_csv('test.csv')
-    # nuevos_estudiantes = testing_data[['PuntajeExamen','PromedioAcumulado']].values
-    # for estudiante in nuevos_estudiantes:
-    #     nuevo_estudiante_normalizado = Normalizacion_nuevos_datos(estudiante, min_vals, range_vals)
-    #     nuevo_estudiante_normalizado = [1] + nuevo_estudiante_normalizado.tolist()  
-    #     probabilidad = hipotesis(params_finales, nuevo_estudiante_normalizado)
-    #     if probabilidad < 0.5:
-    #         print(f"{contador}) El nuevo estudiante será admitido en la universidad")
-    #     else:
-    #         print(f"{contador}) El nuevo estudiante no será admitido en la universidad ")
-    #     contador += 1
+    contador = 1
+    testing_data = pd.read_csv('test.csv')
+    nuevos_estudiantes = testing_data[['PuntajeExamen','PromedioAcumulado']].values
+    for estudiante in nuevos_estudiantes:
+        nuevo_estudiante_normalizado = Normalizacion_nuevos_datos(estudiante, min_vals, range_vals)
+        nuevo_estudiante_normalizado = [1] + nuevo_estudiante_normalizado.tolist()  
+        probabilidad = hipotesis(params_finales, nuevo_estudiante_normalizado)
+        if probabilidad < 0.5:
+            print(f"{contador}) El nuevo estudiante será admitido en la universidad")
+        else:
+            print(f"{contador}) El nuevo estudiante no será admitido en la universidad ")
+        contador += 1
 
