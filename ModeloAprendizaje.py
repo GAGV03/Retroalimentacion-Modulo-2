@@ -111,7 +111,8 @@ if __name__ == "__main__":
     print("*************************************")
     
     contador = 1
-    nuevos_estudiantes = [[20, 3.5],[100,10],[95,8.5],[50,6.5],[70,7.0],[80,8.0],[10,10]]
+    testing_data = pd.read_csv('test.csv')
+    nuevos_estudiantes = testing_data[['PuntajeExamen','PromedioAcumulado']].values
     for estudiante in nuevos_estudiantes:
         nuevo_estudiante_normalizado = Normalizacion_nuevos_datos(estudiante, min_vals, range_vals)
         nuevo_estudiante_normalizado = [1] + nuevo_estudiante_normalizado.tolist()  
