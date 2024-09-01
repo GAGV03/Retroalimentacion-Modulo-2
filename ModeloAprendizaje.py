@@ -106,17 +106,50 @@ if __name__ == "__main__":
     plt.ylabel('Error Medio (Entropía Cruzada)')
     plt.show()
 
+    #Aqui va la validacao TOCA HACER ESTA MIERDA :(
+
     print("*************************************")
-    print("PREDICCIONES PARA EL SET DE TESTING")
+    print("VALIDACIONES DEL MODELO")
     print("*************************************")
+
+    validation_data = pd.read_csv('validation.csv')
+    datos_validation = validation_data[['PuntajeExamen','PromedioAcumulado']].values
+    resultados_validation = validation_data[['Admision']].values
+
+    for estudiante,resultado in zip (datos_validation,resultados_validation):
+        estudiante_validation_normalizado = Normalizacion_nuevos_datos(estudiante,min_vals,range_vals)
+        estudiante_validation_normalizado = [1] + estudiante_validation_normalizado.tolist()
+        probabilidad_validation = hipotesis(params_finales,estudiante_validation_normalizado)
+        if probabilidad_validation < 0.5:
+            print(probabilidad_validation)
+            resultado_validation = 0
+            if resultado_validation == resultado:
+                print("La predicción fue correcta")
+            else:
+                print("La predicción no fue correcta")
+        else:
+            print(probabilidad_validation)
+            resultado_validation = 1
+            if resultado_validation == resultado:
+                print("La predicción fue correcta")
+            else:
+                print("La predicción no fue correcta")
+        
+
+    # print("*************************************")
+    # print("PREDICCIONES PARA EL SET DE TESTING")
+    # print("*************************************")
     
-    contador = 1
-    testing_data = pd.read_csv('test.csv')
-    nuevos_estudiantes = testing_data[['PuntajeExamen','PromedioAcumulado']].values
-    for estudiante in nuevos_estudiantes:
-        nuevo_estudiante_normalizado = Normalizacion_nuevos_datos(estudiante, min_vals, range_vals)
-        nuevo_estudiante_normalizado = [1] + nuevo_estudiante_normalizado.tolist()  
-        probabilidad = hipotesis(params_finales, nuevo_estudiante_normalizado)
-        print(f"{contador}) La probabilidad predicha de que el nuevo estudiante sea admitido es: " + str(probabilidad))
-        contador += 1
+    # contador = 1
+    # testing_data = pd.read_csv('test.csv')
+    # nuevos_estudiantes = testing_data[['PuntajeExamen','PromedioAcumulado']].values
+    # for estudiante in nuevos_estudiantes:
+    #     nuevo_estudiante_normalizado = Normalizacion_nuevos_datos(estudiante, min_vals, range_vals)
+    #     nuevo_estudiante_normalizado = [1] + nuevo_estudiante_normalizado.tolist()  
+    #     probabilidad = hipotesis(params_finales, nuevo_estudiante_normalizado)
+    #     if probabilidad < 0.5:
+    #         print(f"{contador}) El nuevo estudiante será admitido en la universidad")
+    #     else:
+    #         print(f"{contador}) El nuevo estudiante no será admitido en la universidad ")
+    #     contador += 1
 
