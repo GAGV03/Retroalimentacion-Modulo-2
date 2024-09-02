@@ -167,7 +167,7 @@ if __name__ == "__main__":
         nuevo_estudiante_normalizado = Normalizacion_nuevos_datos(estudiante, min_vals, range_vals)
         nuevo_estudiante_normalizado = [1] + nuevo_estudiante_normalizado.tolist()  
         probabilidad = hipotesis(params_finales, nuevo_estudiante_normalizado)
-        if probabilidad < 0.5:
+        if probabilidad > 0.5:
             print(f"{contador}) El nuevo estudiante será admitido en la universidad")
         else:
             print(f"{contador}) El nuevo estudiante no será admitido en la universidad ")
