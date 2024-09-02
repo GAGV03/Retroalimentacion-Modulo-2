@@ -94,7 +94,7 @@ if __name__ == "__main__":
     admision = training_data['Admision']
    
     #Este es el learning rate que se utilizará con el modelo
-    learning_rate = 0.01
+    learning_rate = 0.1
 
     #Aquí se ejecuta la función del modelo y se obtienen valores que serán utilizados para el testing
     params_finales, min_vals, range_vals = logistic_regression(params, datos_estudiantes, admision, learning_rate)
@@ -127,16 +127,8 @@ if __name__ == "__main__":
         probabilidad_validation = hipotesis(params_finales,estudiante_validation_normalizado)
         if probabilidad_validation < 0.5:
             resultado_validation = 0
-            if resultado_validation == resultado:
-                print(f"{contador}) La predicción fue correcta")
-            else:
-                print(f"{contador})La predicción no fue correcta")
         else:
             resultado_validation = 1
-            if resultado_validation == resultado:
-                print(f"{contador})La predicción fue correcta")
-            else:
-                print(f"{contador})La predicción no fue correcta")
         contador += 1
 
         if resultado_validation == 1 and resultado == 1:
@@ -156,8 +148,6 @@ if __name__ == "__main__":
     # Matriz de confusión
     matriz_confusion = [[TN, FP], [FN, TP]]
 
-    # Mostrar resultados
-    print("*************************************")
     print("MÉTRICAS DE VALORACIÓN DEL MODELO")
     print("*************************************")
     print(f"Matriz de Confusión: {matriz_confusion}")
