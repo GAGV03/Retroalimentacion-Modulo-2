@@ -27,6 +27,7 @@ def cross_entropy_loss(params, samples, valor_y):
     errores.append(error_medio)
     return error_medio
 
+#Función de Gradient Descent para la evolución del código
 def GradientDescent(params, samples, learn_rate, valor_y):
     params = np.array(params)
     num_samples = len(samples)
@@ -55,6 +56,7 @@ def Normalizacion(samples):
 
     return normalized_samples.tolist(), min_vals, diferencia
 
+#Función de normalización para los nuevos datos con los valores obtenidos del entrenamiento 
 def Normalizacion_nuevos_datos(nuevos_datos, min_vals, range_vals):
     nuevos_datos_norm = (np.array(nuevos_datos) - min_vals) / range_vals
     return nuevos_datos_norm
@@ -99,6 +101,7 @@ if __name__ == "__main__":
     #Aquí se ejecuta la función del modelo y se obtienen valores que serán utilizados para el testing
     params_finales, min_vals, range_vals = logistic_regression(params, datos_estudiantes, admision, learning_rate)
 
+    #Se gráfica la relación entre los errores y las épocas
     import matplotlib.pyplot as plt
     plt.plot(errores)
     plt.xlabel('Epochs')
@@ -110,17 +113,19 @@ if __name__ == "__main__":
     print("VALIDACIONES DEL MODELO")
     print("*************************************")
 
-    # Inicializar contadores
+    # Inicializar contadores de los cuadrantes de la matriz de confusión
     TP = 0
     TN = 0
     FP = 0
     FN = 0
 
+    #Se lee el archivo con el dataset para la etapa de validación
     validation_data = pd.read_csv('validation.csv')
     datos_validation = validation_data[['PuntajeExamen','PromedioAcumulado']].values
     resultados_validation = validation_data[['Admision']].values
     contador = 1
 
+    #Comparación de las predicciones hechas por el modelo con el valor original
     for estudiante,resultado in zip (datos_validation,resultados_validation):
         estudiante_validation_normalizado = Normalizacion_nuevos_datos(estudiante,min_vals,range_vals)
         estudiante_validation_normalizado = [1] + estudiante_validation_normalizado.tolist()
@@ -131,6 +136,7 @@ if __name__ == "__main__":
             resultado_validation = 1
         contador += 1
 
+        #Actualización de los valores de los cuadrantes de la matriz de confusión
         if resultado_validation == 1 and resultado == 1:
             TP += 1
         elif resultado_validation == 0 and resultado == 0:
@@ -148,6 +154,7 @@ if __name__ == "__main__":
     # Matriz de confusión
     matriz_confusion = [[TN, FP], [FN, TP]]
 
+    #Muestra visual de las métricas que evalúan al modelo 
     print("MÉTRICAS DE VALORACIÓN DEL MODELO")
     print("*************************************")
     print(f"Matriz de Confusión: {matriz_confusion}")
@@ -161,8 +168,12 @@ if __name__ == "__main__":
     print("*************************************")
     
     contador = 1
+
+    #Se lee el archivo del dataset que se utilizará para la etapa de testing
     testing_data = pd.read_csv('test.csv')
     nuevos_estudiantes = testing_data[['PuntajeExamen','PromedioAcumulado']].values
+
+    #Se recorren los datos y se realizan predicciones con cada uno
     for estudiante in nuevos_estudiantes:
         nuevo_estudiante_normalizado = Normalizacion_nuevos_datos(estudiante, min_vals, range_vals)
         nuevo_estudiante_normalizado = [1] + nuevo_estudiante_normalizado.tolist()  
