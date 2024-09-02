@@ -94,7 +94,7 @@ if __name__ == "__main__":
     admision = training_data['Admision']
    
     #Este es el learning rate que se utilizará con el modelo
-    learning_rate = 0.1
+    learning_rate = 0.5
 
     #Aquí se ejecuta la función del modelo y se obtienen valores que serán utilizados para el testing
     params_finales, min_vals, range_vals = logistic_regression(params, datos_estudiantes, admision, learning_rate)
